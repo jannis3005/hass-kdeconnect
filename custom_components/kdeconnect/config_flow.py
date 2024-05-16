@@ -2,10 +2,11 @@ import asyncio
 import logging
 import voluptuous as vol
 from homeassistant import config_entries
-
-_LOGGER = logging.getLogger(__name__)
+from homeassistant.components.zeroconf import ZeroconfServiceInfo
 
 from .const import DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
 
 class KDEConnectConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
@@ -15,7 +16,6 @@ class KDEConnectConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.discovery_info = None
 
     async def async_step_user(self, user_input=None):
-        # This step will be called when the user initiates the integration
         if user_input is not None:
             return await self.async_step_pair()
 
@@ -23,14 +23,24 @@ class KDEConnectConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=vol.Schema({})
         )
 
-    async def async_step_zeroconf(self, discovery_info):
+    async def async_step_zeroconf(self, discovery_info: ZeroconfServiceInfo):
         _LOGGER.debug(f"Discovered KDE Connect device: {discovery_info}")
         self.discovery_info = discovery_info
         return await self.async_step_pair()
 
     async def async_step_pair(self, user_input=None):
-        device_name = self.discovery_info.get("name")
-        device_id = self.discovery_info.get("properties", {}).get("deviceId")
+        if not self.discovery_info:
+            return self.async_abort(reason="no_discovery_info")
+
+        # Extracting device info from the discovery_info
+        device_name = self.discovery_info.name
+        properties = self.discovery_info.properties
+        device_id = properties.get("id")
+        protocol_version = properties.get("protocol")
+        device_type = properties.get("type")
+
+        if not device_id or not device_name:
+            return self.async_abort(reason="missing_device_info")
 
         # Send pair request
         success = await self._send_pair_request(device_id)
