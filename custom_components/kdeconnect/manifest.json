@@ -1,0 +1,8 @@
+{
+  "domain": "kdeconnect",
+  "name": "KDE Connect",
+  "version": "0.0.1",
+  "config_flow": true,
+  "codeowners": ["@jannis3005"],
+  "iot_class": "local_push"
+}
