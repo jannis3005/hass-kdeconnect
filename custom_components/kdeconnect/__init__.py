@@ -1,9 +1,6 @@
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 
-DOMAIN = "kdeconnect"
-
-
 async def async_setup(hass: HomeAssistant, config: dict):
     # This function can be used to perform setup tasks that are necessary when Home Assistant starts
     # You might not need this if you're only handling config flow and discovery initially
