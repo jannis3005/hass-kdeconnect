@@ -2,6 +2,7 @@ import asyncio
 import logging
 import voluptuous as vol
 from homeassistant import config_entries
+from homeassistant.core import callback
 from homeassistant.components.zeroconf import ZeroconfServiceInfo
 
 from .const import DOMAIN
@@ -26,21 +27,37 @@ class KDEConnectConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_zeroconf(self, discovery_info: ZeroconfServiceInfo):
         _LOGGER.debug(f"Discovered KDE Connect device: {discovery_info}")
         self.discovery_info = discovery_info
-        return await self.async_step_pair()
 
-    async def async_step_pair(self, user_input=None):
-        if not self.discovery_info:
-            return self.async_abort(reason="no_discovery_info")
-
-        # Extracting device info from the discovery_info
-        device_name = self.discovery_info.name
         properties = self.discovery_info.properties
         device_id = properties.get("id")
-        protocol_version = properties.get("protocol")
-        device_type = properties.get("type")
+        device_name = properties.get("name")
 
-        if not device_id or not device_name:
-            return self.async_abort(reason="missing_device_info")
+        await self.async_set_unique_id(device_id)
+        self._abort_if_unique_id_configured()
+
+        self.context.update({
+            "title_placeholders": {
+                "name": device_name
+            }
+        })
+
+        return await self.async_step_confirm()
+
+    async def async_step_confirm(self, user_input=None):
+        if user_input is not None:
+            return await self.async_step_pair()
+
+        return self.async_show_form(
+            step_id="confirm",
+            description_placeholders={
+                "name": self.discovery_info.properties.get("name")
+            }
+        )
+
+    async def async_step_pair(self, user_input=None):
+        properties = self.discovery_info.properties
+        device_id = properties.get("id")
+        device_name = properties.get("name")
 
         # Send pair request
         success = await self._send_pair_request(device_id)
