@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "KDE Connect Configuration",
+        "description": "Set up KDE Connect integration",
+        "data": {
+        }
+      },
+      "pair": {
+        "title": "Pairing"
+      }
+    },
+    "progress": {
+        "task_pairing": "A pairing request has been sent to {name}.\nPlease confirm pairing on the device..."
+    },
+    "abort": {
+      "pairing_failed": "Pairing request failed. Please try again.",
+      "already_configured": "Device is already configured"
+    }
+  }
+}
