@@ -6,5 +6,5 @@
   "integration_type": "device",
   "codeowners": ["@jannis3005"],
   "iot_class": "local_push",
-  "zeroconf": ["_kdeconnect._udp"]
+  "zeroconf": ["_kdeconnect._udp.local."]
 }
