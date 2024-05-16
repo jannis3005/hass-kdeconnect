@@ -5,6 +5,7 @@
   "config_flow": true,
   "integration_type": "device",
   "codeowners": ["@jannis3005"],
+  "dependencies": ["zeroconf"],
   "iot_class": "local_push",
   "zeroconf": ["_kdeconnect._udp.local."]
 }
